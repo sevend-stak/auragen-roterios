@@ -1,0 +1,84 @@
+{
+  "name": "Auragen Roteiros V2",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "auragen-roterios-v2",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook - Receber tema e plataforma",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookDescription": {
+        "httpMethod": "POST",
+        "path": "auragen-roterios-v2"
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyD-EXEMPLO-CHAVE-GRATUITA",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "contents": [
+            {
+              "parts": [
+                {
+                  "text": "Gere um roteiro criativo para {{ $json[\"plataforma\"] }} com estilo e linguagem típicos dessa plataforma, usando emojis e ritmo natural. O tema é: {{ $json[\"tema\"] }}. Estruture assim:\n🎬 Roteiro para {{ $json[\"plataforma\"] }}:\n\n🔹 Introdução (curta e chamativa):\n🔹 Gancho (que prenda atenção):\n🔹 Desenvolvimento (conteúdo principal):\n🔹 Encerramento (com CTA adequado à plataforma):"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "id": "2",
+      "name": "Gerar roteiro com Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "responseMode": "onReceived",
+        "responseData": {
+          "responseBody": {
+            "roteiro": "={{ $json[\"candidates\"][0][\"content\"][\"parts\"][0][\"text\"] }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "3",
+      "name": "Responder ao Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - Receber tema e plataforma": {
+      "main": [
+        [
+          {
+            "node": "Gerar roteiro com Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar roteiro com Gemini": {
+      "main": [
+        [
+          {
+            "node": "Responder ao Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

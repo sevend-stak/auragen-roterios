@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Auragen - Gerador de Roteiros</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;max-width:760px;margin:28px auto;padding:0 18px;color:#111}
+    h1{font-size:20px;margin-bottom:6px}
+    label{display:block;margin-top:12px;font-weight:600}
+    input,select{width:100%;padding:10px;margin-top:6px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
+    button{margin-top:14px;padding:12px 14px;border:none;border-radius:10px;background:#1a73e8;color:#fff;font-weight:700}
+    pre{white-space:pre-wrap;background:#f6f8fa;padding:12px;border-radius:10px;border:1px solid #eee;margin-top:12px}
+  </style>
+</head>
+<body>
+  <h1>🎬 Auragen — Gerador de Roteiros</h1>
+  <label>Plataforma</label>
+  <select id="plataforma">
+    <option>TikTok</option>
+    <option>Instagram Reels</option>
+    <option>YouTube Shorts</option>
+  </select>
+  <label>Tema</label>
+  <input id="tema" placeholder="Ex: rotina de quem quer mudar de vida">
+  <button id="btn">Gerar Roteiro</button>
+  <pre id="resultado">O resultado aparecerá aqui...</pre>
+
+  <script>
+    const N8N_WEBHOOK = "https://SEU-N8N-WEBHOOK"; // substitua pelo seu webhook real
+    const btn = document.getElementById("btn");
+    const res = document.getElementById("resultado");
+
+    btn.addEventListener("click", () => {
+      const plataforma = document.getElementById("plataforma").value;
+      const tema = document.getElementById("tema").value.trim();
+      if(!tema){ res.textContent = "Digite um tema."; return; }
+      res.textContent = "Gerando roteiro... 🧠";
+
+      fetch(N8N_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plataforma, tema })
+      })
+      .then(r => r.json())
+      .then(data => res.textContent = data.roteiro || JSON.stringify(data))
+      .catch(err => res.textContent = "❌ Erro: " + err.message);
+    });
+  </script>
+</body>
+</html>
